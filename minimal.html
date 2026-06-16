@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="author" content="CostyCNC">
-  <title>Minimal AVR ASM LDI Compiler</title>
+  <title>Minimal AVR ASM LDI Compiler & Tutorial</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,10 +21,11 @@
       padding: 30px;
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      max-width: 500px;
+      max-width: 600px;
       width: 100%;
+      margin-bottom: 30px;
     }
-    h2 {
+    h2, h3 {
       margin-top: 0;
       color: #0056b3;
       text-align: center;
@@ -75,10 +76,59 @@
       font-size: 18px;
       font-weight: bold;
     }
+    
+    /* Stili per la sezione Tutorial */
+    .tutorial-box {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+    .tutorial-box h3 {
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 10px;
+      text-align: left;
+    }
+    .bit-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+      font-size: 14px;
+    }
+    .bit-table th, .bit-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    .bit-table th {
+      background-color: #f8f9fa;
+    }
+    .opcode-bg { background-color: #ffe3e3; font-weight: bold; }
+    .val-bg { background-color: #e3f2fd; }
+    .reg-bg { background-color: #e8f5e9; }
+    
+    ul {
+      padding-left: 20px;
+      line-height: 1.6;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    code {
+      background-color: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
+<!-- COMPILATORE INTERATTIVO -->
 <div class="container">
   <h2>Minimal AVR LDI Compiler</h2>
   
@@ -93,7 +143,7 @@
   </div>
 
   <div class="form-group">
-    <label for="value">Value (2 digits, e.g., 20):</label>
+    <label for="value">Value (Hex format, 2 digits, e.g., 20):</label>
     <input id="value" type="text" value="20">
   </div>
 
@@ -103,6 +153,57 @@
     <b>Result Opcode:</b> <span id="result">-</span>
   </div>
 </div>
+
+<!-- TUTORIAL STRUTTURA A 16 BIT -->
+<div class="tutorial-box">
+  <h3>How a 16-bit AVR Instruction is Built</h3>
+  <p>In 8-bit AVR microcontrollers (like ATmega328P on Arduino Nano), instructions are stored as <b>16-bit words</b> inside the Flash memory. Let's see how the <code>LDI</code> (Load Immediate) instruction divides these 16 bits behind the scenes.</p>
+  
+  <p>The official AVR binary template for <code>LDI Rd, K</code> is: <br>
+  <code>1 1 1 0 / K K K K / d d d d / K K K K</code></p>
+
+  <table class="bit-table">
+    <tr>
+      <th>Bits 15-12</th>
+      <th>Bits 11-8</th>
+      <th>Bits 7-4</th>
+      <th>Bits 3-0</th>
+    </tr>
+    <tr>
+      <td class="opcode-bg">1 1 1 0</td>
+      <td class="val-bg">K K K K</td>
+      <td class="reg-bg">d d d d</td>
+      <td class="val-bg">K K K K</td>
+    </tr>
+    <tr>
+      <td><b>Opcode (E)</b></td>
+      <td>Value (High)</td>
+      <td>Register Bits</td>
+      <td>Value (Low)</td>
+    </tr>
+  </table>
+
+  <ul>
+    <li>
+      <span class="opcode-bg">Bits 15-12 (1110 = Hex 'E')</span>: This is the fixed <b>Opcode for LDI</b>. Every instruction in AVR has its own unique binary prefix (Opcode) so the CPU control unit can recognize it instantly during the fetch phase:
+      <ul>
+        <li><code>1110</code> (Hex <b>E</b>) is the fixed prefix for <b>LDI</b>. The CPU sees 'E' and prepares to load an immediate value.</li>
+        <li><code>0110</code> (Hex <b>6</b>) is the fixed prefix for <b>ORI</b>. The CPU sees '6' and triggers a logical OR operation.</li>
+        <li><code>0000 11</code> (6-bit prefix) is the fixed opcode for <b>ADD</b>. The CPU decodes these first bits and triggers the ALU to sum two registers.</li>
+      </ul>
+    </li>
+    <li>
+      <span class="reg-bg">Bits 7-4 (dddd)</span>: This represents the <b>Destination Register</b>. Since LDI only works with registers <code>R16</code> to <code>R31</code>, the hardware subtracts 16. So, R16 becomes <code>0000</code>, R17 becomes <code>0001</code>, and R31 becomes <code>1111</code>.
+    </li>
+    <li>
+      <span class="val-bg">Bits 11-8 and 3-0 (KKKK KKKK)</span>: This is the 8-bit <b>Operand value</b> (the constant). The microcontroller splits it into two chunks of 4 bits to fit them around the register bits!
+    </li>
+  </ul>
+
+  <p><b>Example with LDI R17, 20</b> (where Hex 20 is binary <code>0010 0000</code> and R17 becomes index <code>1</code>):<br>
+  The final 16-bit binary is <code>1110 0010 0001 0000</code>, which translates perfectly to the hex code <b><code>E210</code></b>!</p>
+</div>
+
 
 <script>
 function comp() {
@@ -121,9 +222,7 @@ function comp() {
 
   var value1 = parseInt(document.getElementById("register").value.trim(), 10);
   if (value1 > 15 && value1 <= 31) {
-    // Sottrae 16 per mappare i registri R16-R31 (0-15 nei bit di LDI)
     var regOffset = value1 - 16;
-    // Converte in esadecimale maiuscolo
     number1 = regOffset.toString(16).toUpperCase(); 
   } else {
     document.getElementById("result").innerHTML = "Error: LDI requires R16 to R31";
@@ -132,13 +231,14 @@ function comp() {
 
   var value2 = document.getElementById("value").value.trim();
   if (value2.length >= 2) {
-    number2 = value2[0];
-    number3 = value2[1]; 
+    number2 = value2[0]; // Primo carattere esadecimale (High nibble)
+    number3 = value2[1]; // Secondo carattere esadecimale (Low nibble)
     
-    // Mostra il codice macchina esadecimale risultante
-    document.getElementById("result").innerHTML = number1 + number3 + " " + number + number2;
+    // Mostra il codice macchina nel formato corretto 
+    // Ricostruisce la stringa unendo i nibble secondo la mappa dei bit AVR
+    document.getElementById("result").innerHTML = number + number2 + number1 + number3;
   } else {
-    document.getElementById("result").innerHTML = "Error: Value must be 2 digits";
+    document.getElementById("result").innerHTML = "Error: Value must be 2 hex digits";
   }
 }
 </script>
