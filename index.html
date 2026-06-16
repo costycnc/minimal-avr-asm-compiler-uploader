@@ -247,39 +247,48 @@
 
 <script>
 function comp() {
-  var number = "";
-  var number1 = "";
-  var number2 = "";
-  var number3 = "";
+  var opcode_prefix = "E"; // LDI prefix is always 'E'
+  var reg_hex = "";
   
-  var value = document.getElementById("command").value.trim().toUpperCase();
-  if (value === "LDI") {
-    number = "E"; // Primo carattere Hex fissa (Opcode)
-  } else {
+  var command_val = document.getElementById("command").value.trim().toUpperCase();
+  if (command_val !== "LDI") {
     document.getElementById("result").innerHTML = "Unsupported Command";
     return;
   }
 
-  var value1 = parseInt(document.getElementById("register").value.trim(), 10);
-  if (value1 > 15 && value1 <= 31) {
-    var regOffset = value1 - 16;
-    number1 = regOffset.toString(16).toUpperCase(); // Terzo carattere Hex (Registro)
+  var reg_val = parseInt(document.getElementById("register").value.trim(), 10);
+  if (reg_val > 15 && reg_val <= 31) {
+    var regOffset = reg_val - 16;
+    reg_hex = regOffset.toString(16).toUpperCase(); 
   } else {
     document.getElementById("result").innerHTML = "Error: LDI requires R16 to R31";
     return;
   }
 
-  var value2 = document.getElementById("value").value.trim();
-  if (value2.length == 2) {
-    number2 = value2[0].toUpperCase(); // Secondo carattere Hex (High nibble del valore)
-    number3 = value2[1].toUpperCase(); // Quarto carattere Hex (Low nibble del valore)
+  var hex_value = document.getElementById("value").value.trim();
+  if (hex_value.length === 2) {
+    // Extract the high and low nibbles from the user input string
+    var val_high_nibble = hex_value[0].toUpperCase(); 
+    var val_low_nibble = hex_value[1].toUpperCase();  
     
-    // Compone l'Opcode a 16 bit nel formato esatto dell'architettura AVR: E K d K
-    document.getElementById("result").innerHTML = number + number2 + number1 + number3;
+    // 1. Construct the logical 16-bit word (Format: E K_high Reg K_low)
+    var logicalWord = opcode_prefix + val_high_nibble + reg_hex + val_low_nibble;
+    
+    // 2. Separate the logical bytes
+    var logical_byte_high = opcode_prefix + val_high_nibble; // e.g., "E2"
+    var logical_byte_low = reg_hex + val_low_nibble;        // e.g., "10"
+    
+    // 3. Flip them for Little Endian .hex file output
+    var hexFileFormat = logical_byte_low + " " + logical_byte_high; // e.g., "10 E2"
+    
+    // Output the result to the page
+    document.getElementById("result").innerHTML = 
+      "Logical Word: <b>" + logicalWord + "</b> | .HEX Little Endian File Format: <span style='color:#d9534f; font-weight:bold;'>" + hexFileFormat + "</span>";
   } else {
     document.getElementById("result").innerHTML = "Error: Value must be exactly 2 hex digits";
   }
 }
 </script>
+
 </body>
 </html>
