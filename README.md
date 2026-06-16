@@ -2,7 +2,7 @@
 A lightweight, single-page web tool built to compile basic AVR Assembly (`LDI` instruction) directly into 16-bit machine code opcodes, featuring an interactive educational guide on hardware bitfields.
 
 
-🌐 **Live Demo:** [costycnc.github.io/YOUR-REPO-NAME](https://github.io) *(Optional: update this link later)*
+🌐 **Live Demo:**      https://costycnc.github.io/minimal-avr-asm-compiler-uploader
 
 
 ---## 💡 About the Project
