@@ -196,6 +196,13 @@
   <h3>How a 16-bit AVR Instruction is Built</h3>
   <p>In 8-bit AVR microcontrollers (like ATmega328P on Arduino Nano), instructions are stored as <b>16-bit words</b> inside the Flash memory. Let's see how the <code>LDI</code> (Load Immediate) instruction divides these 16 bits behind the scenes.</p>
   
+  <p><b>Example with LDI R17, 20</b> (where Hex 20 is binary <code>0010 0000</code> and R17 becomes index <code>1</code>):<br>
+  The logical 16-bit word is <code>1110 0010 0001 0000</code>, which translates to the hex value <b><code>E210</code></b>.</p>
+
+  <p>⚠️ <b>The Little Endian Reality:</b> <br>
+  Because AVR architecture uses the <b>Little Endian</b> format, the microcontroller stores the lowest byte first in memory. 
+  Therefore, the final 2 bytes written into your <code>.hex</code> file will be flipped: <b><code>10 E2</code></b>!</p>
+
   <p>The official AVR binary template for <code>LDI Rd, K</code> is: <br>
   <code>1 1 1 0 / K K K K / d d d d / K K K K</code></p>
 
@@ -224,22 +231,20 @@
     <li>
       <span class="opcode-bg">Bits 15-12 (1110 = Hex 'E')</span>: This is the fixed <b>Opcode for LDI</b>. Every instruction in AVR has its own unique binary prefix (Opcode) so the CPU control unit can recognize it instantly during the fetch phase:
       <ul>
-        <li><code>1110</code> (Hex <b>E</b>) is the fixed prefix for <b>LDI</b>. The CPU sees 'E' and prepares to load an immediate value.</li>
-        <li><code>0110</code> (Hex <b>6</b>) is the fixed prefix for <b>ORI</b>. The CPU sees '6' and triggers a logical OR operation.</li>
-        <li><code>0000 11</code> (6-bit prefix) is the fixed opcode for <b>ADD</b>. The CPU decodes these first bits and triggers the ALU to sum two registers.</li>
+        <li><code>1110</code> (Hex <b>E</b>) is the fixed prefix for <b>LDI</b>.</li>
+        <li><code>0110</code> (Hex <b>6</b>) is the fixed prefix for <b>ORI</b>.</li>
+        <li><code>0000 11</code> (6-bit prefix) is the fixed opcode for <b>ADD</b>.</li>
       </ul>
     </li>
     <li>
-      <span class="reg-bg">Bits 7-4 (dddd)</span>: This represents the <b>Destination Register</b>. Since LDI only works with registers <code>R16</code> to <code>R31</code>, the hardware subtracts 16. So, R16 becomes <code>0000</code>, R17 becomes <code>0001</code>, and R31 becomes <code>1111</code>.
+      <span class="reg-bg">Bits 7-4 (dddd)</span>: This represents the <b>Destination Register</b>. Since LDI only works with registers <code>R16</code> to <code>R31</code>, the hardware subtracts 16. So, R17 becomes index <code>1</code> (binary <code>0001</code>).
     </li>
     <li>
-      <span class="val-bg">Bits 11-8 and 3-0 (KKKK KKKK)</span>: This is the 8-bit <b>Operand value</b> (the constant). The microcontroller splits it into two chunks of 4 bits to fit them around the register bits!
+      <span class="val-bg">Bits 11-8 and 3-0 (KKKK KKKK)</span>: This is the 8-bit <b>Operand value</b>. The microcontroller splits it into two chunks of 4 bits to fit them around the register bits!
     </li>
   </ul>
-
-  <p><b>Example with LDI R17, 20</b> (where Hex 20 is binary <code>0010 0000</code> and R17 becomes index <code>1</code>):<br>
-  The final 16-bit binary is <code>1110 0010 0001 0000</code>, which translates perfectly to the hex code <b><code>E210</code></b>!</p>
 </div>
+
 <script>
 function comp() {
   var number = "";
