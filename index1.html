@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+
+
+<html lang="en">
+
+<head>
+
+
+
+  <meta charset="utf-8" />
+
+
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+
+  <meta name="author" content="CostyCNC">
+
+  <title>Create and upload Arduino hex file directly from a web page</title>
+
+  <meta name="description" content="This program allows you to create and upload Arduino hex files directly from a web page. It's a simple and easy way to write code for your Arduino without the need for an IDE.">
+
+  <meta name="keywords" content="arduino, hex file, web page, create, upload, simple, easy, ide">
+
+
+
+
+
+
+
+
+
+  <script src="main-beauty.js"></script>
+
+
+
+</head>
+
+
+
+
+
+
+
+<body>
+
+  <p><h2> Minimal mode to write hex to arduino</h2></p>
+
+
+
+  <p><button arduino-uploader hex-href="C:\Users\costycnc\Documents\Arduino\_sites-google-blink-opcode\presepe-7\nativity-presepe.hex" board="nano" verify>
+
+
+
+    Arduino nano with new bootloader [<span class="upload-progress"></span>]
+
+
+
+  </button>
+
+
+
+<button arduino-uploader hex-href="C:\Users\costycnc\Documents\Arduino\_sites-google-blink-opcode\presepe-7\nativity-presepe.hex" board="nanoOldBootloader" verify>
+
+
+
+    Arduino nano with old bootloader [<span class="upload-progress"></span>]
+
+
+
+  </button>
+  </p>
+
+  <p><input type="file" onchange="loadhex(this.files)"></p>
+
+  <p><b>HexCode<b><br>
+
+    <textarea costycnc rows="10" cols="30" rows="rows"></textarea>
+
+  <label for="hcode">Choose a example:</label>
+
+  <select name="hcode" id="hcode" onchange="SelectExample()">
+
+    <option value="null"></option>
+
+    <option value="blink">Blink</option>
+
+    <option value="ledon">LedON</option>
+
+    <option value="ledoff">LedOFF</option>
+
+  </select>
+
+</p>
+
+
+
+
+
+<p>
+    <b>AsmCODE</b><br>
+
+    <div style="border:1px solid" id="asm"></div>
+    </p>
+
+
+
+	<p>How to compile asm to hex <a href="https://www.costycnc.it/avr-hex-uploader/easy-hex-create.zip">download kit from here</a>
+	</p>
+
+
+
+  <p><h3><a href="https://github.com/dbuezas/arduino-web-uploader">Thanks to https://github.com/dbuezas/arduino-web-uploader</a></h3></p>
+
+
+
+  <p><a href="https://bipes.net.br/aroca/web-serial-terminal/">web-serial-terminal (https://bipes.net.br/aroca/web-serial-terminal/)</a><br>
+
+      
+
+    <a href=" https://costycnc1.blogspot.com/2023/05/costycnc-refirmware-macchina-taglia.html">Clicca qui per Tutorial come ricaricare firmware in macchina taglia polistirolo costycnc</a>
+
+  <br>
+
+    <a href=" https://costycnc1.blogspot.com/2023/05/costycnc-refirmware-macchina-taglia.html">Click here for Tutorial refirmware costycnc macchine</a>
+
+</p>
+
+<p><a href="http://www.costycnc.it/firmware/firmware/nema.h">download costycnc hex firmware for CostycNC foam cutter cnc </a></p>
+
+<script>
+
+  var hexvalue;
+
+  
+
+  function loadhex(files) {
+
+  const reader = new FileReader()
+
+  reader.onload = (e) => {
+
+  //console.log(e.target.result);
+
+  hexvalue=e.target.result;
+
+  document.querySelector("[costycnc]").value=e.target.result;
+
+  }
+
+
+
+  reader.readAsText(files[0])
+
+
+
+}
+
+
+
+function SelectExample() {
+
+  var x = document.getElementById("hcode").value;
+
+  if (x=="blink"){
+
+  hexvalue=":020000020000FC:040000000C946000FC:1000C00000E210E204B905B902D00127FCCF40E4F8:1000D0005AEF6AEF6A950000E9F75A95D1F74A9509:0400E000B9F70895CF:00000001FF"
+
+  var asmcode="";
+
+    }
+
+  else if (x=="ledon"){
+
+  hexvalue=":020000020000FC:040000000C946000FC:0800C0008FEF84B985B9FFCF71:00000001FF"; 
+
+    var asmcode="<p>.device ATmega32</p><p>.org 0x0000<br>jmp main<br>.org 0x0060</p><p>main:<br>ldi r24, (1<<5)<br>out 0X04,r24<br>out 0X05,r24</p>";
+
+    }
+
+  else if (x=="ledoff"){
+
+  hexvalue=":020000020000FC:040000000C946000FC:0800C00080E084B985B9FFCF8F:00000001FF"
+
+    var asmcode="<p>.device ATmega32</p><p>.org 0x0000<br>jmp main<br>.org 0x0060</p><p>main:<br>ldi r24, 0<br>out 0X04,r24<br>out 0X05,r24</p>";
+
+    }
+
+	  document.querySelector("[costycnc]").value=hexvalue;
+
+	  document.getElementById("asm").innerHTML=asmcode;
+
+  
+
+}
+
+</script>
+
+</p><a href="https://docs.google.com/spreadsheets/d/1nOhRBQG_5Spupwo4xVvBden4xPVSnB7GLhz15bMSmuE/edit?usp=sharing">avr 8bit machine codes</a></p>
+<table>
+  <tr>
+    <th>Command</th>
+    <th>Register</th>
+    <th>Value</th>
+    <th>Result</th>
+  </tr>
+  <tr>
+    <td><input id="command" type="text" value="LDI"></td>
+    <td>R<input id="register" type="text" value="17"></td>
+    <td><input id="value" type="text" value="20"></td>
+    <td id="result" ></td>
+  </tr>
+</table>
+<button onclick="comp();">compile</button></p>
+<script>
+
+
+function comp(){
+    var number,number1,number2,number3;
+var value=document.getElementById("command").value;
+
+if (value=="LDI") {number="E";}
+
+var value1=document.getElementById("register").value;
+
+if (value1>15) {number1=value1-16;}
+
+var value2=document.getElementById("value").value;
+
+number2=value2[0];
+number3=value2[1]; 
+document.querySelectorAll("td")[3].innerHTML=number1+number3+" "+number+number2;
+//document.getElementById("result").innerHTML="aaaa";
+
+}
+</script>
+
+</body>
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,3014 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+
+  <meta name="author" content="CostyCNC">
+
+  <title>Create and upload Arduino hex file directly from a web page</title>
+
+  <meta name="description" content="This program allows you to create and upload Arduino hex files directly from a web page. It's a simple and easy way to write code for your Arduino without the need for an IDE.">
+
+  <meta name="keywords" content="arduino, hex file, web page, create, upload, simple, easy, ide">
+
+<style>
+
+element.style {
+
+}
+
+.small {
+
+    font-size: smaller;
+
+}
+
+.memory-block {
+
+    width: 1.8em;
+
+    display: inline-block;
+
+    text-align: center;
+
+}
+
+.instr-bg {
+
+    background-color: #E6F3FF;
+
+}
+
+* {
+
+    -webkit-box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+
+    box-sizing: border-box;
+
+}
+
+div {
+
+    display: block;
+
+}
+
+.source-code {
+
+    font-family: source-code-pro, Courier New;
+
+}
+
+body {
+
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.42857143;
+
+    color: #333;
+
+    background-color: #fff;
+
+}
+
+html {
+
+    font-size: 10px;
+
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+}
+
+html {
+
+    font-family: sans-serif;
+
+    -webkit-text-size-adjust: 100%;
+
+    -ms-text-size-adjust: 100%;
+
+}
+
+:after, :before {
+
+    -webkit-box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+
+    box-sizing: border-box;
+
+}
+
+:after, :before {
+
+    -webkit-box-sizing: border-box;
+
+    -moz-box-sizing: border-box;
+
+    box-sizing: border-box;
+
+}
+
+</style>
+
+  <script src="main-beauty.js"></script>
+
+</head>
+
+<body>
+
+  <p><h2> Minimal mode to write hex to arduino </h2> see <a href="https://sourceware.org/binutils/docs/as/AVR-Opcodes.html"> Opcodes</a>    and see  <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf">Atmega328p datasheet</a></p>
+
+  <p><button arduino-uploader hex-href="C:\Users\costycnc\Documents\Arduino\_sites-google-blink-opcode\presepe-7\nativity-presepe.hex" board="nano" verify>
+
+    Arduino nano with new bootloader [<span class="upload-progress"></span>]
+
+  </button>
+
+<button arduino-uploader hex-href="C:\Users\costycnc\Documents\Arduino\_sites-google-blink-opcode\presepe-7\nativity-presepe.hex" board="nanoOldBootloader" verify>
+
+    Arduino nano with old bootloader [<span class="upload-progress"></span>]
+
+  </button>
+
+  </p>
+
+  <p><input type="file" onchange="loadhex(this.files)"></p>
+
+  <p><b>HexCode<b><br>
+
+    <textarea costycnc cols=50 rows=20 ></textarea>
+
+  
+
+<script>
+
+  var hexvalue;
+
+  
+
+  function loadhex(files) {
+
+  const reader = new FileReader()
+
+  reader.onload = (e) => {
+
+  //console.log(e.target.result);
+
+  hexvalue=e.target.result;
+
+  document.querySelector("[costycnc]").value=e.target.result;
+
+  }
+
+  reader.readAsText(files[0])
+
+}
+
+function SelectExample() {
+
+  var x = document.getElementById("hcode").value;
+
+  if (x=="blink"){
+
+  hexvalue=":020000020000FC\n:040000000C946000FC\n:1000C00000E210E204B905B902D00127FCCF40E4F8\n:1000D0005AEF6AEF6A950000E9F75A95D1F74A9509\n:0400E000B9F70895CF\n:00000001FF"
+
+  var asmcode="";
+
+    }
+
+  else if (x=="ledon"){
+
+  hexvalue=":020000020000FC\n:040000000C946000FC\n:0800C0008FEF84B985B9FFCF71\n:00000001FF"; 
+
+    var asmcode="<p>.device ATmega32</p><p>.org 0x0000<br>jmp main<br>.org 0x0060</p><p>main:<br>ldi r24, (1<<5)<br>out 0X04,r24<br>out 0X05,r24</p>";
+
+    }
+
+  else if (x=="ledoff"){
+
+  hexvalue=":020000020000FC\n:040000000C946000FC\n:0800C00080E084B985B9FFCF8F\n:00000001FF"
+
+    var asmcode="<p>.device ATmega32</p><p>.org 0x0000<br>jmp main<br>.org 0x0060</p><p>main:<br>ldi r24, 0<br>out 0X04,r24<br>out 0X05,r24</p>";
+
+    }
+
+	  document.querySelector("[costycnc]").value=hexvalue;
+
+	  document.getElementById("asm").innerHTML=asmcode;
+
+  
+
+}
+
+</script>
+
+<textarea id="code" cols=50 rows=20> </textarea>
+
+<button onclick="compile();">Compile</button>
+
+<div style="width:29em;" class="source-code">
+
+<div class="memory-block ">
+
+    <div>
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div><div class="memory-block ">
+
+    <div >
+
+        <div class="small">00</div>                                    
+
+    </div>
+
+</div>
+
+ </div>
+
+ <textarea id="hexcode" cols=30 rows="10"> </textarea>
+
+ <label for="hcode">Choose a example:</label>
+
+  <select name="hcode" id="hcode" onchange="SelectExample()">
+
+    <option value="null"></option>
+
+    <option value="blink">Blink</option>
+
+    <option value="ledon">LedON</option>
+
+    <option value="ledoff">LedOFF</option>
+
+  </select>
+
+</p>
+
+<p>
+
+    <b>AsmCODE</b><br>
+
+    <div style="border:1px solid" id="asm"></div>
+
+    </p>
+
+	<p>How to compile asm to hex <a href="https://www.costycnc.it/avr-hex-uploader/easy-hex-create.zip">download kit from here</a>
+
+	</p>
+
+  <p><h3><a href="https://github.com/dbuezas/arduino-web-uploader">Thanks to https://github.com/dbuezas/arduino-web-uploader</a></h3></p>
+
+  <p><a href="https://bipes.net.br/aroca/web-serial-terminal/">web-serial-terminal (https://bipes.net.br/aroca/web-serial-terminal/)</a><br>
+
+      
+
+    <a href=" https://costycnc1.blogspot.com/2023/05/costycnc-refirmware-macchina-taglia.html">Clicca qui per Tutorial come ricaricare firmware in macchina taglia polistirolo costycnc</a>
+
+  <br>
+
+    <a href=" https://costycnc1.blogspot.com/2023/05/costycnc-refirmware-macchina-taglia.html">Click here for Tutorial refirmware costycnc macchine</a>
+
+</p>
+
+<p><a href="http://www.costycnc.it/firmware/firmware/nema.h">download costycnc hex firmware for CostycNC foam cutter cnc </a></p>
+
+<script>
+
+            // Use https://www.debuggex.com/
+
+            // Matches: "label: INSTRUCTION (["')OPERAND1(]"'), (["')OPERAND2(]"')
+
+            // GROUPS:      1       2               3                    7
+
+            var regex = /^[\t ]*(?:([.A-Za-z]\w*)[:])?(?:[\t ]*([A-Za-z]{2,5})(?:[\t ]+(\[(\w+((\+|-)\d+)?)\]|\".+?\"|\'.+?\'|[.A-Za-z0-9]\w*)(?:[\t ]*[,][\t ]*(\[(\w+((\+|-)\d+)?)\]|\".+?\"|\'.+?\'|[.A-Za-z0-9]\w*))?)?)?/;
+
+            // Regex group indexes for operands
+
+            var op1_group = 3;
+
+            var op2_group = 7;
+
+            // MATCHES: "(+|-)INTEGER"
+
+            var regexNum = /^[-+]?[0-9]+$/;
+
+            // MATCHES: "(.L)abel"
+
+            var regexLabel = /^[.A-Za-z]\w*$/;
+
+            // Contains the program code & data generated by the assembler
+
+            var code = [];
+
+            // Contains the mapping from instructions to assembler line
+
+            var mapping = {};
+
+            // Hash map of label used to replace the labels after the assembler generated the code
+
+            var labels = {};
+
+            // Hash of uppercase labels used to detect duplicates
+
+            var normalizedLabels = {};            // Hash map of label used to replace the labels after the assembler generated the code
+
+			
+
+			var strf="";
+
+//document.getElementById("code").value="LDI R16, 100000b;LED BUILTIN\nOUT 4, R16\nOUT 5, R16\nloop:\nrjmp loop";
+
+document.getElementById("code").value="		LDI   R16, 0b100000\n		LDI   R17, 0b100000\n		OUT   4, R16\n"+
+
+"LOOP:\n 		OUT   5, R16\n		RCALL D_1S\n		EOR   R16, R17\n		RJMP  LOOP\nD_1S:\n		LDI   R20, 100\n"+
+
+"DEL1:	LDI   R21, 100\nDEL2:	LDI   R22, 100\nDEL3:	DEC   R22\n		NOP\n		BRNE  DEL3\n		DEC   r21\n"+
+
+"		BRNE  DEL2\n		DEC   r20\n		BRNE  DEL1\n		RET";
+
+// Split text into code lines
+
+var input=document.getElementById("code").value;
+
+            var addLabel = function (label) {
+
+                var upperLabel = label.toUpperCase();
+
+                if (upperLabel in normalizedLabels)
+
+                    throw "Duplicate label: " + label;
+
+                if (upperLabel === "A" || upperLabel === "B" || upperLabel === "C" || upperLabel === "D")
+
+                    throw "Label contains keyword: " + upperLabel;
+
+                labels[label] = code.length;
+
+            };
+
+            // Allowed formats: 200, 200d, 0xA4, 0o48, 101b
+
+            var parseNumber = function (input) {
+
+                if (input.slice(0, 2) === "0x") {
+
+                    return parseInt(input.slice(2), 16);
+
+                } else if (input.slice(0, 2) === "0o") {
+
+                    return parseInt(input.slice(2), 8);
+
+                } else if (input.slice(0,2) === "0b") {
+
+                    return parseInt(input.slice(2), 2);
+
+                } else if (input.slice(input.length - 1) === "d") {
+
+                    return parseInt(input.slice(0, input.length - 1), 10);
+
+                } else if (regexNum.exec(input)) {
+
+                    return parseInt(input, 10);
+
+                } else {
+
+                    throw "Invalid number format";
+
+                }
+
+            };
+
+const myChildDivs = document.querySelectorAll(".small");
+
+function compile()
+
+ {
+
+    var nr=0;
+
+	input=document.getElementById("code").value;
+
+	var lines = input.split('\n');
+
+	
+
+	
+
+	             code = [];
+
+            // Contains the mapping from instructions to assembler line
+
+            mapping = {};
+
+            // Hash map of label used to replace the labels after the assembler generated the code
+
+			   labels = {};
+
+            // Hash of uppercase labels used to detect duplicates
+
+            normalizedLabels = {};
+
+			
+
+		//trova tutti i label e salva in labels
+
+		
+
+for (var i = 0, l = lines.length; i < l; i++) 
+
+{   
+
+	var match = regex.exec(lines[i]);
+
+	if (match[1] !== undefined || match[2] !== undefined) 
+
+	{
+
+		if (match[1] !== undefined) 
+
+		{
+
+			addLabel(match[1]);
+
+		}
+
+		if (match[2] !== undefined) 
+
+		{
+
+				var instr = match[2].toUpperCase();
+
+				switch (instr)
+
+				{
+
+					case 'LDI':	code.push(1,1);break;
+
+					case 'OUT':	code.push(1,1);break;
+
+					case 'RJMP':code.push(1,1);break;
+
+					case 'BRNE':code.push(1,1);break;
+
+					case 'DEC':code.push(1,1);break;
+
+					case 'INC':code.push(1,1);break;
+
+					case 'EOR':code.push(1,1);break;
+
+					case 'RET':code.push(1,1);break;
+
+					case 'RCALL':code.push(1,1);break;
+
+					case 'NOP':code.push(1,1);break;
+
+				
+
+				}		
+
+		}
+
+	
+
+    }
+
+}			
+
+code = [];
+
+mapping = {};
+
+		  //Programul principal
+
+	
+
+	
+
+	
+
+	var a,r,hx,lx,s,p;
+
+	for (var i = 0, l = lines.length; i < l; i++) 
+
+	{   
+
+		var match = regex.exec(lines[i]);
+
+		if (match[1] !== undefined || match[2] !== undefined) {
+
+					//fatto sopra if (match[1] !== undefined) {addLabel(match[1]);}
+
+			if (match[2] !== undefined) {
+
+				var instr = match[2].toUpperCase();
+
+				var p1, p2, opCode;
+
+				// Add mapping instr pos to line number
+
+				// Don't do it for DB as this is not a real instruction
+
+				if (instr !== 'DB') {
+
+					mapping[code.length] = i;
+
+				}
+
+				switch (instr) {
+
+              
+
+					case 'LDI':
+
+				
+
+					p1 = match[op1_group];
+
+					p2 = match[op2_group];
+
+					r=p1.slice(1)-16;
+
+					a=parseNumber(p2);
+
+					hx = a >> 4;
+
+					lx = a & 0xF;
+
+					s=r*16+lx;
+
+					p=0xE*16+hx;
+
+					
+
+					code.push(s,p);
+
+					
+
+					//a=10 b=E2 Ldi R17,0x20 (32) a=xx*16+ 
+
+					
+
+					break;
+
+					case 'OUT':
+
+						p1 = parseNumber(match[op1_group]);
+
+						p2 = match[op2_group].slice(1)-16;
+
+						a=(p2*16)+p1;
+
+						b=0xB9;
+
+						code.push(a,b);					
+
+						break;
+
+					case 'DEC':
+
+						p1 = match[op1_group];
+
+					    var r=p1.slice(1)-16;
+
+                        s=r*16+10;
+
+						p=0x95;
+
+						code.push(s,p);					
+
+						break;
+
+					case 'INC':
+
+						p1 = match[op1_group];
+
+						var r=p1.slice(1)-16;
+
+                        s=r*16+3;
+
+						p=0x95;
+
+						code.push(s,p);					
+
+						break;
+
+					case 'EOR':
+
+						p1 = match[op1_group];
+
+						p2 = match[op2_group];
+
+						var hx=p1.slice(1)-16;
+
+						var lx=p2.slice(1)-16;
+
+                        s=hx*16+lx;
+
+						p=0x27;
+
+						code.push(s,p);					
+
+						break;
+
+					case 'RET':
+
+                        s=8;
+
+						p=0x95;
+
+						code.push(s,p);					
+
+						break;
+
+					case 'NOP':
+
+                        s=0;
+
+						p=0;
+
+						code.push(s,p);					
+
+						break;
+
+					case 'RCALL':
+
+					
+
+					p1 = match[op1_group];
+
+					if(p1 in labels) 
+
+						{
+
+							iv=code.length;
+
+							pv=labels[p1];
+
+									if (pv>iv) 
+
+								{
+
+									s = (pv-iv)/2-1;
+
+									p=13*16;
+
+								}
+
+								else 
+
+								{	
+
+									s = 256+(pv-iv)/2-1;
+
+									p=13*16+15;	
+
+								}		
+
+						}
+
+						code.push(s,p);
+
+					break;
+
+						
+
+						
+
+						
+
+					case 'RJMP':
+
+					
+
+					p1 = match[op1_group];
+
+					if(p1 in labels) 
+
+						{
+
+							iv=code.length;
+
+							pv=labels[p1];
+
+									if (pv>iv) 
+
+								{
+
+									a = (pv-iv)/2-1;
+
+									b=12*16;
+
+								}
+
+								else 
+
+								{	
+
+									a = 256+(pv-iv)/2-1;
+
+									b=12*16+15;	
+
+								}		
+
+						}
+
+						code.push(a,b);
+
+					break;
+
+									
+
+						
+
+						
+
+						
+
+						
+
+					case 'BRNE':
+
+					
+
+				p1 = match[op1_group];
+
+				if(p1 in labels) 
+
+					{
+
+						iv=code.length;
+
+						pv=labels[p1];
+
+							if (pv>iv) 
+
+							{
+
+								a = (pv-iv)*4+1-8;
+
+								b=15*16+4;
+
+							}
+
+							else 
+
+							{					
+
+					
+
+								a = 256+(((pv-iv)*4+1)-8);
+
+								b=15*16+7;
+
+													
+
+							}
+
+					code.push(a,b);		
+
+					}else{ alert("not find label=",p1) }
+
+					
+
+						break;					
+
+					
+
+					default:
+
+						throw "Invalid instruction: " + match[2];
+
+				}
+
+			}
+
+		} 
+
+		else {
+
+			// Check if line starts with a comment otherwise the line contains an error and can not be parsed
+
+			var line = lines[i].trim();
+
+			if (line !== "" && line.slice(0, 1) !== ";") {
+
+				throw "Syntax error";
+
+			}
+
+		}
+
+	} 
+
+	
+
+	
+
+	//scrive in div e salva in codeh sir cod in hex
+
+		for (var i = 0, l = code.length; i < l; i++) 
+
+	{   
+
+		var cdx=code[i].toString(16).toUpperCase();
+
+		myChildDivs[i].innerText=cdx.padStart(2, "0");
+
+        
+
+	}				
+
+//crea avr hex intel file
+
+hexvalue=":020000020000FC\n:040000000C946000FC\n";  
+
+var ab=0;
+
+let group1;
+
+for (let i = 0; i <code.length; i += 16) {
+
+    let group = code.slice(i, i + 16); //valori in decimal 11,230,16,...
+
+	
+
+	//parte1 calculeaza ce lungime are pachetul e lo scrive a inizio 08xxxxxxxxxxxxxx (con carattere hex e 08 no 8)
+
+	 let dimens=(group.length).toString(16).toUpperCase();// dimensiune normal pachete di 16 e che rimani e di meno
+
+	 console.log("dimens",dimens); //31 -> 1F quanto bytes scrive una volta
+
+	 group1 = ":"+dimens.padStart(2, "0"); //se e 8 -> 08 e scrive prima valoare lunghezza di string in buffer
+
+	 
+
+	 //parte2 calculeaza adresa da dove deve scrivere (con caractere hex) 
+
+	 let mn=0;
+
+	mn=192+i;
+
+	console.log(i);
+
+	  const numberString = mn.toString(16).toUpperCase();   //
+
+	// Pad the number string with zeros to the left.
+
+	const pad = numberString.padStart(4, "0"); //000001  scrive adressa dove deve scrivere
+
+	group1 += pad+"00";
+
+	
+
+	//parte 3 calculeaza checksum e crive in buffer string hex
+
+	
+
+	group = code.slice(i, i + 16); //group se carica con buffer decimal
+
+     ab=group.length+mn; //per checksum variabile ab con prime numere gia calcolate (nr di hex + indirizzo)
+
+      for (let j = 0; j < group.length; j++) {
+
+	    ab +=group[j];
+
+		cdxy=group[j].toString(16).toUpperCase();
+
+		group1 +=cdxy.padStart(2, "0"); //scrive hex code in string
+
+	    }
+
+		
+
+	ab=ab & 0xFF;
+
+ab=256-ab;
+
+group1=group1+ab.toString(16).toUpperCase();
+
+hexvalue +=group1 +"\n";
+
+}
+
+hexvalue +=":00000001FF";
+
+document.getElementById("hexcode").value=hexvalue;
+
+ document.querySelector("[costycnc]").value=hexvalue;
+
+				
+
+}                                    
+
+</script>
+
+</p><a href="https://docs.google.com/spreadsheets/d/1nOhRBQG_5Spupwo4xVvBden4xPVSnB7GLhz15bMSmuE/edit?usp=sharing">avr 8bit machine codes</a></p>
+
+<table>
+
+  <tr>
+
+    <th>Command</th>
+
+    <th>Register</th>
+
+    <th>Value</th>
+
+    <th>Result</th>
+
+  </tr>
+
+  <tr>
+
+    <td><input id="command" type="text" value="LDI"></td>
+
+    <td>R<input id="register" type="text" value="17"></td>
+
+    <td><input id="value" type="text" value="20"></td>
+
+    <td id="result" ></td>
+
+  </tr>
+
+</table>
+
+<button onclick="comp();">compile</button></p>
+
+<script>
+
+function comp(){
+
+    var number,number1,number2,number3;
+
+var value=document.getElementById("command").value;
+
+if (value=="LDI") {number="E";}
+
+var value1=document.getElementById("register").value;
+
+if (value1>15) {number1=value1-16;}
+
+var value2=document.getElementById("value").value;
+
+number2=value2[0];
+
+number3=value2[1]; 
+
+document.querySelectorAll("td")[3].innerHTML=number1+number3+" "+number+number2;
+
+//document.getElementById("result").innerHTML="aaaa";
+
+}
+
+</script><div><img alt="arduino nano V3.0 mini usb digital pins" src="https://images.theengineeringprojects.com/image/webp/2018/06/introduction-to-arduino-nano-13-1.png.webp"></div><div><img alt="atmega328 dip-28 digital pins" src="https://4.bp.blogspot.com/-o3wPSKHLFmo/WxEFyC8WlvI/AAAAAAAAFuY/tMQY03RJdVUtCUcxKA5QdboyRQBhj8OIwCLcBGAs/s1600/atmega328w.png"></div><div><img alt="atmega328p TQFP digitals pin" src="https://fabacademy.org/2021/labs/berytech/students/ghinwa-azzi/images/weekviii/atmega328.png"></div>
+
+
+</body>
+
+</html>
