@@ -241,7 +241,6 @@
   The final 16-bit binary is <code>1110 0010 0001 0000</code>, which translates perfectly to the hex code <b><code>E210</code></b>!</p>
 </div>
 
-<script>
 function comp() {
   var number = "";
   var number1 = "";
@@ -250,7 +249,7 @@ function comp() {
   
   var value = document.getElementById("command").value.trim().toUpperCase();
   if (value === "LDI") {
-    number = "E";
+    number = "E"; // Primo carattere Hex fissa (Opcode)
   } else {
     document.getElementById("result").innerHTML = "Unsupported Command";
     return;
@@ -259,23 +258,24 @@ function comp() {
   var value1 = parseInt(document.getElementById("register").value.trim(), 10);
   if (value1 > 15 && value1 <= 31) {
     var regOffset = value1 - 16;
-    number1 = regOffset.toString(16).toUpperCase(); 
+    number1 = regOffset.toString(16).toUpperCase(); // Terzo carattere Hex (Registro)
   } else {
     document.getElementById("result").innerHTML = "Error: LDI requires R16 to R31";
     return;
   }
 
   var value2 = document.getElementById("value").value.trim();
-  if (value2.length >= 2) {
-    number2 = value2; 
-    number3 = value2; 
+  if (value2.length == 2) {
+    number2 = value2[0].toUpperCase(); // Secondo carattere Hex (High nibble del valore)
+    number3 = value2[1].toUpperCase(); // Quarto carattere Hex (Low nibble del valore)
     
+    // Compone l'Opcode a 16 bit nel formato esatto dell'architettura AVR: E K d K
     document.getElementById("result").innerHTML = number + number2 + number1 + number3;
   } else {
-    document.getElementById("result").innerHTML = "Error: Value must be 2 hex digits";
+    document.getElementById("result").innerHTML = "Error: Value must be exactly 2 hex digits";
   }
 }
-</script>
+
 
 </body>
 </html>
