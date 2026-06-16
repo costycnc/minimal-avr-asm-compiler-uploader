@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="CostyCNC">
+  <title>Minimal AVR ASM LDI Compiler</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      padding: 40px 20px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+    h2 {
+      margin-top: 0;
+      color: #0056b3;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .result-box {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e9ecef;
+      border-left: 5px solid #0056b3;
+      border-radius: 4px;
+    }
+    .result-box b {
+      color: #0056b3;
+    }
+    #result {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Minimal AVR LDI Compiler</h2>
+  
+  <div class="form-group">
+    <label for="command">Instruction / Command:</label>
+    <input id="command" type="text" value="LDI">
+  </div>
+
+  <div class="form-group">
+    <label for="register">Register (e.g., 17 for R17):</label>
+    <input id="register" type="text" value="17">
+  </div>
+
+  <div class="form-group">
+    <label for="value">Value (2 digits, e.g., 20):</label>
+    <input id="value" type="text" value="20">
+  </div>
+
+  <button onclick="comp();">Compile to Machine Code</button>
+
+  <div class="result-box">
+    <b>Result Opcode:</b> <span id="result">-</span>
+  </div>
+</div>
+
+<script>
+function comp() {
+  var number = "";
+  var number1 = "";
+  var number2 = "";
+  var number3 = "";
+  
+  var value = document.getElementById("command").value.trim().toUpperCase();
+  if (value === "LDI") {
+    number = "E";
+  } else {
+    document.getElementById("result").innerHTML = "Unsupported Command";
+    return;
+  }
+
+  var value1 = parseInt(document.getElementById("register").value.trim(), 10);
+  if (value1 > 15 && value1 <= 31) {
+    // Sottrae 16 per mappare i registri R16-R31 (0-15 nei bit di LDI)
+    var regOffset = value1 - 16;
+    // Converte in esadecimale maiuscolo
+    number1 = regOffset.toString(16).toUpperCase(); 
+  } else {
+    document.getElementById("result").innerHTML = "Error: LDI requires R16 to R31";
+    return;
+  }
+
+  var value2 = document.getElementById("value").value.trim();
+  if (value2.length >= 2) {
+    number2 = value2[0];
+    number3 = value2[1]; 
+    
+    // Mostra il codice macchina esadecimale risultante
+    document.getElementById("result").innerHTML = number1 + number3 + " " + number + number2;
+  } else {
+    document.getElementById("result").innerHTML = "Error: Value must be 2 digits";
+  }
+}
+</script>
+
+</body>
+</html>
