@@ -1,6 +1,10 @@
 # Minimal AVR ASM LDI Compiler & Tutorial 🚀
 A lightweight, single-page web tool built to compile basic AVR Assembly (`LDI` instruction) directly into 16-bit machine code opcodes, featuring an interactive educational guide on hardware bitfields.
 
+
+🌐 **Live Demo:** [costycnc.github.io/YOUR-REPO-NAME](https://github.io) *(Optional: update this link later)*
+
+
 ---## 💡 About the Project
 This project demonstrates the core relationship between high-level code illusions and true hardware reality. While compilers often mask how a microcontroller processes instructions, this tool takes an Assembly statement and breaks it down to its raw binary and hexadecimal representation.
 
